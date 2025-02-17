@@ -8,8 +8,8 @@ BUCKET_NAME="fraud-detection-012725"
 
 # Script and data file names (assumed to be in the current directory)
 GLUE_SCRIPT="optimized_fraud_detection_glue_job.py"
-NOTEBOOK_SCRIPT="sagemaker_notebook_code.ipynb"   # Your SageMaker Notebook code file
-INFERENCE_SCRIPT="inference.py"                     # Your separate inference script
+NOTEBOOK_SCRIPT="separated_sagemaker_notebook_code.ipynb"   # Your SageMaker Notebook code file
+INFERENCE_SCRIPT="separatedinference.py"                     # Your separate inference script
 RAW_DATA_FILE="test_cloudPipeline_raw_data.csv"
 
 # S3 folder structure
