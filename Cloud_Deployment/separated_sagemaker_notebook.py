@@ -257,8 +257,8 @@ model_data = f"s3://{BUCKET_NAME}/{model_s3_key}"
 inference_script_s3 = f"s3://{BUCKET_NAME}/{s3_prefix}/scripts/inference.py"
 
 # Download the inference script locally so that the SKLearnModel container can use it.
-inference_script_local = "inference.py"
-s3.download_file(BUCKET_NAME, f"{s3_prefix}/scripts/inference.py", inference_script_local)
+inference_script_local = "separated_inference.py"
+s3.download_file(BUCKET_NAME, f"{s3_prefix}/scripts/separated_inference.py", inference_script_local)
 
 sklearn_model = SKLearnModel(
     model_data=model_data,
