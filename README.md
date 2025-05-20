@@ -80,9 +80,9 @@ Ensure the following are installed:
 ### **2. Running the Preprocessing Pipeline Locally**
 Run the following command to preprocess the dataset:
 ```bash
-spark-submit PySpark_Preprocessing.py
+spark-submit ML_Model_Development/PySpark_Preprocessing.py
 ```
-Note that this script expects the original dirty credit card dataset `creditcard.csv` to be inside the same directory as the script is localed in.
+Note that the script expects the original dirty credit card dataset `creditcard.csv` to be in the same directory as the script is located in.
  Running the this will generate cleaned and scaled **train**, **validation**, and **test** CSV files inside the same directory as the script itself.
 
 ### **3. Deploying to AWS**
