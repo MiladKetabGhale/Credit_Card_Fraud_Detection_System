@@ -57,16 +57,48 @@ The model training phase applies **9 different resampling techniques** to improv
 
 The final model is an **XGBoost-based classifier**, trained and tuned with **cross-validation** to optimize hyperparameters.
 
-## AWS Deployment
-The fraud detection system is deployed on AWS using a **Bash script** that automates the following:
+## AWS-Based Deployment (Production-Ready Infrastructure)
 
-1. **S3 Upload**: Uploads raw data, preprocessed files, and scripts to an S3 bucket.
-2. **IAM Role Creation**: Configures roles for Glue and SageMaker.
-3. **AWS Glue Processing**: Runs a Glue ETL job to structure and prepare data.
-4. **SageMaker Training**: Triggers SageMaker Notebook for model training and evaluation.
-5. **Inference Deployment**: Uploads an inference script to SageMaker for real-time fraud detection.
+The fraud detection pipeline is fully automated and deployable on AWS through robust Bash scripting and the AWS CLI. The deployment infrastructure adheres to security best practices and follows an idempotent setup, ensuring reproducibility and fault tolerance.
 
-The script includes **status checks** for Glue crawlers and jobs, ensuring they complete successfully before proceeding.
+### Key AWS Services Used
+ - **Amazon S3** – Centralized storage for raw data, preprocessed datasets, scripts, model artifacts, and predictions.
+ - **AWS Glue** – Serverless data integration and ETL service for schema inference and transformation.
+ - **Amazon SageMaker** – Managed platform for model training, evaluation, and real-time inference.
+ - **IAM (Identity and Access Management)** – Manages secure access and fine-grained permissions for Glue and SageMaker components.
+
+### Deployment Workflow: Fully Automated in Two Stages
+
+Deployment is managed via two idempotent Bash scripts:
+
+### 1. `s3_provision_encryption_idempotency.sh`
+
+This script sets up a secure and compliant S3 environment. It ensures repeatable infrastructure provisioning without side effects.
+
+#### Main responsibilities:
+
+ - Create an S3 bucket (if it doesn’t exist)
+ - Enforce server-side AES-256 encryption
+ - Block all public access (in line with security best practices)
+ - Scaffold the required S3 directory topology:
+
+### 2. `automated_deployment_script.sh`
+
+This script handles the orchestration of AWS services. It intelligently checks service statuses, ensures successful transitions between stages, and enables full pipeline automation.
+
+#### Main responsibilities:
+
+   - Upload datasets and code artifacts to designated S3 prefixes
+   - Create or validate IAM roles:
+   - GlueServiceRole
+   - SageMakerExecutionRole
+   - Configure and execute a Glue Crawler, polling until completion
+   - Trigger a Glue ETL Job for data transformation
+   - Upload SageMaker assets:
+   - Jupyter notebook for training
+   - Python inference script for deployment
+   - Launch SageMaker training and evaluation
+   - Deploy the trained model as a real-time inference endpoint
 
 ## Setup and Usage
 ### **1. Prerequisites**
@@ -85,17 +117,6 @@ spark-submit ML_Model_Development/PySpark_Preprocessing.py
 Note that the script expects the original dirty credit card dataset `creditcard.csv` to be in the same directory as the script is located in.
  Running the this will generate cleaned and scaled **train**, **validation**, and **test** CSV files inside the same directory as the script itself.
 
-### **3. Deploying to AWS**
-Execute the Bash script to deploy the entire system:
-```bash
-chmod +x deploy_fraud_detection.sh
-./deploy_fraud_detection.sh
-```
-This will:
-- Upload the data and scripts to S3.
-- Set up IAM roles.
-- Run AWS Glue and SageMaker services.
-
 ## Results and Performance
 The **best XGBoost model** was evaluated using multiple metrics:
 - **Precision / Recall**: Assesses fraud detection trade-offs.
@@ -103,21 +124,3 @@ The **best XGBoost model** was evaluated using multiple metrics:
 - **Geometric Mean (G-Mean)**: Measures classifier balance on imbalanced data.
 
 Results are logged and available in **SageMaker Notebook outputs**.
-
-## Repository Structure
-```
-/
-├── data/                                      # Raw and preprocessed datasets
-│   ├── creditcard.csv
-│   ├── preprocessed_train.csv
-│   ├── preprocessed_val.csv
-│   ├── preprocessed_test.csv
-│
-├── scripts/                                   # ML and AWS scripts
-│   ├── optimized_fraud_detection_glue_job.py  # PySpark preprocessing script
-│   ├── sagemaker_notebook_code.ipynb          # Model training notebook
-│   ├── inference.py                           # Model inference script
-│   ├── deploy_fraud_detection.sh              # AWS automation script
-│
-├── README.md                                  # Project documentation
-```
