@@ -1,7 +1,7 @@
 # Fraud Detection System Using Machine Learning and AWS
 
 ## Overview
-This project implements an automated **fraud detection system** using **XGBoost-based models** combined with various **sampling techniques** to handle class imbalance. The model is trained after preprocessing the dataset with **PySpark** and deployed on **AWS** using a fully automated Bash script with AWS CLI.
+This project builds a fully automated, cloud-deployable fraud detection system that handles extreme class imbalance using advanced resampling techniques, implements logging and monitoring through MLFlow integrated with automated hpyerparameter tuning using Optuna.  It deploys the trained model on AWS using a production-grade, idempotent infrastructure scripts.
 
 ## Project Features
 - **Data Preprocessing with PySpark**: Scales, normalizes, and transforms the dataset before training.
