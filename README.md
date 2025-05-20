@@ -77,12 +77,13 @@ Ensure the following are installed:
 - AWS CLI (configured with IAM credentials)
 - Bash (Linux/Mac) or Git Bash (Windows)
 
-### **2. Running the Preprocessing Pipeline**
+### **2. Running the Preprocessing Pipeline Locally**
 Run the following command to preprocess the dataset:
 ```bash
-spark-submit optimized_fraud_detection_glue_job.py
+spark-submit PySpark_Preprocessing.py
 ```
-This will generate cleaned and scaled **train**, **validation**, and **test** CSV files.
+Note that this script expects the original dirty credit card dataset `creditcard.csv` to be inside the same directory as the script is localed in.
+ Running the this will generate cleaned and scaled **train**, **validation**, and **test** CSV files inside the same directory as the script itself.
 
 ### **3. Deploying to AWS**
 Execute the Bash script to deploy the entire system:
