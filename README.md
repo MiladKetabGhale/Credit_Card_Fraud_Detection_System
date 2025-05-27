@@ -156,7 +156,78 @@ Final fraud detection is driven by a **voting-based ensemble** composed of the m
 | **Recall (Fraud)**       | 0.82                | **0.82**               |
 | **F1-Score (Fraud)**     | **0.82**             | 0.79                  |
 | **Macro Avg F1-Score**   | **0.91**             | 0.89                  |
-
-> Both ensembles achieve near-perfect accuracy on the imbalanced test set.  
+  
 > **Soft voting** delivers better **fraud precision** and **F1-score**, making it the preferred choice for deployment to minimize false alarms.
+
+## Inference System and Optimization
+
+This project includes a container-ready, production-grade **inference system** that serves the best-performing fraud model (XGBoost + SMOTE) using a lightweight **FastAPI** backend.
+
+The deployed model achieves a **PR-AUC of 0.8253** and uses the following tuned hyperparameters:
+
+```json
+{
+  "colsample_bytree": 0.8,
+  "gamma": 2,
+  "learning_rate": 0.1,
+  "max_depth": 7,
+  "min_child_weight": 2,
+  "n_estimators": 200,
+  "reg_alpha": 2,
+  "reg_lambda": 100,
+  "scale_pos_weight": 0.15,
+  "subsample": 0.8
+}
+```
+### Simulation-Based Inference Testing
+
+To ensure robustness and WAN-class readiness, the inference system was subjected to two phases of simulation using a local loopback **FastAPI** deployment and synthetic WAN noise (**60 ± 20 ms latency**, **3% packet loss**, hot reload every **20s**).
+
+#### Goals
+- Simulate SageMaker endpoint conditions from Australia  
+- Test model reloads under live traffic  
+- Validate thread safety, retry logic, and concurrency behavior  
+- Quantify latency, throughput, and tail risk  
+
+### Simulation Phase 1: Burst-Join Driver (8,800 requests)
+
+| Metric               | Value      |
+|----------------------|------------|
+| Total requests       | 8,800      |
+| Successful (HTTP 200)| 100%       |
+| Failures / retries   | 0%         |
+| Mean latency         | 0.553 sec  |
+| Median latency       | 0.472 sec  |
+| 95th percentile      | 1.287 sec  |
+| Max latency          | 4.159 sec  |
+| Min latency          | 0.365 sec  |
+| Effective throughput | 10.4 req/s |
+
+> Model hot reloads occurred every 20 seconds with **zero disruption to inference flow**.
+
+### Simulation Phase 2: Optimized Fire-and-Forget Driver (29,999 requests)
+
+| Metric               | Before Optimization | After Optimization  | Δ-Factor |
+|----------------------|----------------------|----------------------|----------|
+| Mean latency         | 0.553 sec            | **0.104 sec**        | 5.3×     |
+| Median latency       | 0.472 sec            | **0.104 sec**        | 4.5×     |
+| 95th percentile      | 1.287 sec            | **0.175 sec**        | 7.4×     |
+| Max latency          | 4.159 sec            | **0.322 sec**        | 12.9×    |
+| Total requests       | 8,800                | 30,000               | 3.4×     |
+| Effective throughput | 10.4 req/s           | **288–290 req/s**    | 28×      |
+| Failures             | 0                    | 0                    | –        |
+
+> The final configuration processed **30K WAN-class requests with 0% failure** and **p95 latency of 175 ms**, comfortably meeting real-time fraud-check SLAs.
+
+### Key Optimizations (Client-Side)
+
+| Optimization                      | Impact                                 |
+|----------------------------------|----------------------------------------|
+| Removed backoff delay            | Eliminated 50–100 ms wait per call     |
+| Persistent HTTP sessions         | Saved ~20 ms per request (TCP reuse)   |
+| Pooled concurrency (100 threads) | Overlapped network wait periods        |
+| Fire-and-forget request strategy | Removed `.join()` stalls               |
+
+> None of the optimizations altered the **FastAPI/XGBoost backend** — the gains come entirely from improved client orchestration and concurrency.
+
 
