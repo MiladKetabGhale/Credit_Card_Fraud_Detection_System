@@ -195,7 +195,6 @@ To ensure robustness and WAN-class readiness, the inference system was subjected
 |----------------------|------------|
 | Total requests       | 8,800      |
 | Successful (HTTP 200)| 100%       |
-| Failures / retries   | 0%         |
 | Mean latency         | 0.553 sec  |
 | Median latency       | 0.472 sec  |
 | 95th percentile      | 1.287 sec  |
@@ -215,7 +214,6 @@ To ensure robustness and WAN-class readiness, the inference system was subjected
 | Max latency          | 4.159 sec            | **0.322 sec**        | 12.9×    |
 | Total requests       | 8,800                | 30,000               | 3.4×     |
 | Effective throughput | 10.4 req/s           | **288–290 req/s**    | 28×      |
-| Failures             | 0                    | 0                    | –        |
 
 > The final configuration processed **30K WAN-class requests with 0% failure** and **p95 latency of 175 ms**, comfortably meeting real-time fraud-check SLAs.
 
