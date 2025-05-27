@@ -119,7 +119,7 @@ Note that the script expects the original dirty credit card dataset `creditcard.
 
 ## Results and Evaluations
 
-This system is designed for high-precision fraud detection in the presence of **extreme class imbalance** — only **0.02%** of the dataset consists of fraud cases. The final pipeline combines resampling, threshold tuning, and ensemble voting to maximize detection performance while minimizing false alarms.
+This system is designed for high-precision fraud detection in the presence of **extreme class imbalance** — only **0.17%** of the dataset consists of fraud cases. The final pipeline combines resampling, threshold tuning, and ensemble voting to maximize detection performance while minimizing false alarms.
 
 ### Generalisability of Individual Models
 
