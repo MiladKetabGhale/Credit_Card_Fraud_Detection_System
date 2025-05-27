@@ -117,10 +117,46 @@ spark-submit ML_Model_Development/PySpark_Preprocessing.py
 Note that the script expects the original dirty credit card dataset `creditcard.csv` to be in the same directory as the script is located in.
  Running the this will generate cleaned and scaled **train**, **validation**, and **test** CSV files inside the same directory as the script itself.
 
-## Results and Performance
-The **best XGBoost model** was evaluated using multiple metrics:
-- **Precision / Recall**: Assesses fraud detection trade-offs.
-- **F1-Score**: Harmonic mean of precision and recall.
-- **Geometric Mean (G-Mean)**: Measures classifier balance on imbalanced data.
+## Results and Evaluations
 
-Results are logged and available in **SageMaker Notebook outputs**.
+This system is designed for high-precision fraud detection in the presence of **extreme class imbalance** — only **0.02%** of the dataset consists of fraud cases. The final pipeline combines resampling, threshold tuning, and ensemble voting to maximize detection performance while minimizing false alarms.
+
+### Generalisability of Individual Models
+
+The following resampling methods produced robust base classifiers, tested for generalisation under severe imbalance:
+
+| Sampling Method     | Non-Fraud Accuracy | Fraud Recall | False Positive Rate | False Negative Rate |
+|---------------------|--------------------|--------------|----------------------|----------------------|
+| SMOTE               | 99.9%              | 81.7%        | < 0.1%               | 18.3%                |
+| SMOTE-Tomek Links   | 99.9%              | 81.7%        | < 0.1%               | 18.3%                |
+| Random Oversampling | 99.9%              | **85.0%**    | < 0.1%               | **15.0%**            |
+
+> All three models are effective at correctly identifying legitimate transactions (non-fraud) and produce **very low false positives**.  
+> **Random Oversampling** achieved the **highest fraud recall** and **lowest false negative rate**.
+
+### Threshold Optimization
+
+Precision–recall trade-offs vary with threshold. Each model was tuned to achieve its best operating point:
+
+| Sampling Method     | Optimal Threshold | Precision | Recall |
+|---------------------|-------------------|-----------|--------|
+| SMOTE               | 0.55              | 74%       | 82%    |
+| SMOTE-Tomek Links   | 0.60              | 79%       | 82%    |
+| Random Oversampling | 0.80              | 70%       | **85%**|
+
+### Ensemble Performance
+
+Final fraud detection is driven by a **voting-based ensemble** composed of the most generalisable base models. Evaluation used a **fraud threshold of 0.7**.
+
+#### Summary Table: Soft vs. Hard Voting Ensembles
+
+| Metric                   | Soft Voting Ensemble | Hard Voting Ensemble |
+|--------------------------|----------------------|-----------------------|
+| **Precision (Fraud)**    | **0.82**             | 0.77                  |
+| **Recall (Fraud)**       | 0.82                | **0.82**               |
+| **F1-Score (Fraud)**     | **0.82**             | 0.79                  |
+| **Macro Avg F1-Score**   | **0.91**             | 0.89                  |
+
+> Both ensembles achieve near-perfect accuracy on the imbalanced test set.  
+> **Soft voting** delivers better **fraud precision** and **F1-score**, making it the preferred choice for deployment to minimize false alarms.
+
