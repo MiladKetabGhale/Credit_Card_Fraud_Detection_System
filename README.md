@@ -71,7 +71,7 @@ The fraud detection pipeline is fully automated and deployable on AWS through ro
 
 Deployment is managed via two idempotent Bash scripts:
 
-### 1. `s3_provision_encryption_idempotency.sh`
+### 1. Provisioning (`s3_provision_encryption_idempotency.sh`)
 
 This script sets up a secure and compliant S3 environment. It ensures repeatable infrastructure provisioning without side effects.
 
@@ -82,7 +82,7 @@ This script sets up a secure and compliant S3 environment. It ensures repeatable
  - Block all public access (in line with security best practices)
  - Scaffold the required S3 directory topology:
 
-### 2. `automated_deployment_script.sh`
+### 2. Automated Deployment (`automated_deployment_script.sh`)
 
 This script handles the orchestration of AWS services. It intelligently checks service statuses, ensures successful transitions between stages, and enables full pipeline automation.
 
