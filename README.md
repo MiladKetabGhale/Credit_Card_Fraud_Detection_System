@@ -204,7 +204,7 @@ To ensure robustness and WAN-class readiness, the inference system was subjected
 
 > Model hot reloads occurred every 20 seconds with **zero disruption to inference flow**.
 
-### Simulation Phase 2: Optimized Fire-and-Forget Driver (29,999 requests)
+### Simulation Phase 2: Optimized Fire-and-Forget Driver (30,000 requests)
 
 | Metric               | Before Optimization | After Optimization  | Δ-Factor |
 |----------------------|----------------------|----------------------|----------|
